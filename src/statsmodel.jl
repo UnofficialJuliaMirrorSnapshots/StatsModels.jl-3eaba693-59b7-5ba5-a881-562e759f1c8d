@@ -159,7 +159,7 @@ function StatsBase.predict(mm::TableRegressionModel, data; kwargs...)
         throw(ArgumentError("expected data in a Table, got $(typeof(data))"))
 
     f = mm.mf.f
-    cols, nonmissings = missing_omit(columntable(data), f)
+    cols, nonmissings = missing_omit(columntable(data), f.rhs)
     new_x = modelcols(f.rhs, cols)
     y_pred = predict(mm.model, reshape(new_x, size(new_x, 1), :);
                      kwargs...)
@@ -169,8 +169,8 @@ end
 StatsBase.coefnames(model::TableModels) = coefnames(model.mf)
 
 # coeftable implementation
-function StatsBase.coeftable(model::TableModels)
-    ct = coeftable(model.model)
+function StatsBase.coeftable(model::TableModels; kwargs...)
+    ct = coeftable(model.model, kwargs...)
     cfnames = coefnames(model.mf)
     if length(ct.rownms) == length(cfnames)
         ct.rownms = cfnames
